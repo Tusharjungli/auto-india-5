@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/context/UserContext';
+import { signIn } from 'next-auth/react';
 import toast from 'react-hot-toast';
 
 type AuthFormProps = {
@@ -13,17 +13,41 @@ export default function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useUser();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (email && password.length >= 6) {
-      login(email);
-      toast.success(`${mode === 'login' ? 'Logged in' : 'Signed up'} successfully!`);
-      router.push('/');
-    } else {
+    if (!email || password.length < 6) {
       toast.error('Please enter valid email and password (min 6 chars)');
+      return;
+    }
+
+    if (mode === 'signup') {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+      toast.success('✅ Signed up successfully!');
+    }
+
+    const result = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
+    });
+
+    if (result?.error) {
+      toast.error('❌ Login failed! Check your credentials.');
+    } else {
+      toast.success('✅ Logged in successfully!');
+      router.push('/');
     }
   };
 

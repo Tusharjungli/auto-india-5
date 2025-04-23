@@ -1,21 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingCart, LogOut } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { useUser } from '@/context/UserContext';
-import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import LoginButton from './LoginButton';
+import LogoutButton from './LogoutButton';
 
 export default function Navbar() {
   const { cart } = useCart();
-  const { user, logout } = useUser();
-  const router = useRouter();
+  const { data: session } = useSession();
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
+  const user = session?.user;
 
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-[var(--bg)] text-[var(--text)] shadow-md border-b border-gray-300 dark:border-gray-700 backdrop-blur-md transition-colors">
@@ -39,22 +35,11 @@ export default function Navbar() {
         {user ? (
           <>
             <li><Link href="/dashboard" className="hover:text-gray-500 transition">My Orders</Link></li>
-            <li className="text-xs sm:text-sm text-gray-400">{user}</li>
-            <li>
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-1 hover:text-gray-500 transition"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-            </li>
+            <li className="text-xs sm:text-sm text-gray-400">{user.email}</li>
+            <li><LogoutButton /></li>
           </>
         ) : (
-          <>
-            <li><Link href="/login" className="hover:text-gray-500 transition">Login</Link></li>
-            <li><Link href="/signup" className="hover:text-gray-500 transition">Signup</Link></li>
-          </>
+          <li><LoginButton /></li>
         )}
       </ul>
     </nav>

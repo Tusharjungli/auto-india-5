@@ -1,11 +1,10 @@
 import './globals.css';
-import Navbar from '@/components/Navbar';
+import NavbarWrapper from '@/components/NavbarWrapper';
 import Footer from '@/components/Footer';
 import ThemeToggle from '@/components/ThemeToggle';
-import { CartProvider } from '@/context/CartContext';
-import { UserProvider } from '@/context/UserContext';
-import { Toaster } from 'react-hot-toast';
+import Providers from '@/components/Providers';
 import { Manrope } from 'next/font/google';
+import { cookies } from 'next/headers';
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -18,10 +17,9 @@ export const viewport = {
 };
 
 export const metadata = {
-  metadataBase: new URL('https://yourdomain.com'), // 🔁 replace with real domain when deployed
+  metadataBase: new URL('https://yourdomain.com'),
   title: 'Auto India Spare Parts',
-  description:
-    'Buy premium automobile spare parts online. Fast delivery. Trusted service. Built for India.',
+  description: 'Buy premium automobile spare parts online. Fast delivery. Trusted service. Built for India.',
   icons: {
     icon: '/favicon.ico',
   },
@@ -42,19 +40,24 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // ✅ Correct: Await cookies() before calling .get()
+  const cookieStore = await cookies();
+  const themeCookie = cookieStore.get('theme')?.value;
+  const theme = themeCookie || 'dark';
+
   return (
-    <html lang="en">
-      <body className={`${manrope.variable} font-sans bg-[var(--bg)] text-[var(--text)] transition-colors`}>
-        <UserProvider>
-          <CartProvider>
-            <Navbar />
-            {children}
-            <Footer />
-            <ThemeToggle />
-            <Toaster position="top-center" />
-          </CartProvider>
-        </UserProvider>
+    <html lang="en" className={theme === 'dark' ? 'dark' : ''}>
+      <body
+        className={`${manrope.variable} font-sans bg-[var(--bg)] text-[var(--text)] transition-colors`}
+        suppressHydrationWarning={true}
+      >
+        <Providers>
+          <NavbarWrapper />
+          {children}
+          <Footer />
+          <ThemeToggle />
+        </Providers>
       </body>
     </html>
   );

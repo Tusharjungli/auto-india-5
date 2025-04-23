@@ -1,57 +1,84 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+// prisma/seed.ts
+import { prisma } from '../lib/prisma';
+import bcrypt from 'bcryptjs';
 
 async function main() {
-  // 🔄 Step 1: Clean old data
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
+  // ✅ Create Categories
+  await prisma.category.createMany({
+    data: [
+      { id: 'c1', name: 'Brake Pads', slug: 'brake-pads' },
+      { id: 'c2', name: 'Engine Oils', slug: 'engine-oils' },
+      { id: 'c3', name: 'Air Filters', slug: 'air-filters' },
+    ],
+    skipDuplicates: true,
+  });
 
-  // ✅ Step 2: Add fresh categories
-  const [brake, oil, filter] = await Promise.all([
-    prisma.category.create({ data: { name: 'Brakes' } }),
-    prisma.category.create({ data: { name: 'Engine Oil' } }),
-    prisma.category.create({ data: { name: 'Air Filters' } }),
-  ]);
-
-  // ✅ Step 3: Seed products linked to categories
+  // ✅ Create Products
   await prisma.product.createMany({
     data: [
       {
-        name: 'Kia Brake Pad',
-        description: 'Front disc brake pad — Compatible with Kia Seltos & Sonet',
-        price: 2499,
-        imageUrl: '/images/kia-brake-pad.jpg',
+        id: 'p1',
+        name: 'Kia Brake Pads',
+        price: 1500,
         stock: 20,
-        categoryId: brake.id,
+        imageUrl: '/images/products/brake-pads.jpg',
+        categoryId: 'c1',
+        description: 'High-performance brake pads for Kia vehicles.',
       },
       {
-        name: 'Hyundai Engine Oil 5W-30',
-        description: 'Premium synthetic oil — 3L pack for Hyundai models',
-        price: 1899,
-        imageUrl: '/images/hyundai-oil.jpg',
-        stock: 15,
-        categoryId: oil.id,
+        id: 'p2',
+        name: 'Castrol Engine Oil 5W-30',
+        price: 2500,
+        stock: 50,
+        imageUrl: '/images/products/engine-oil.jpg',
+        categoryId: 'c2',
+        description: 'Premium Castrol engine oil suitable for Indian conditions.',
       },
       {
-        name: 'Tata Safari Air Filter',
-        description: 'HEPA air filter for optimal engine performance',
-        price: 799,
-        imageUrl: '/images/tata-air-filter.jpg',
+        id: 'p3',
+        name: 'Hyundai Air Filter',
+        price: 800,
         stock: 30,
-        categoryId: filter.id,
+        imageUrl: '/images/products/air-filter.jpg',
+        categoryId: 'c3',
+        description: 'Durable air filter compatible with Hyundai models.',
       },
     ],
+    skipDuplicates: true,
   });
 
-  console.log('✅ Clean seed completed: categories + products loaded!');
+  // ✅ Create Admin and Test Users
+  const adminPassword = await bcrypt.hash('admin123', 10);
+  const userPassword = await bcrypt.hash('user123', 10);
+
+  await prisma.user.upsert({
+    where: { email: 'admin@autoindia.com' },
+    update: {},
+    create: {
+      email: 'admin@autoindia.com',
+      name: 'Admin',
+      hashedPassword: adminPassword,
+      isAdmin: true,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: 'user@autoindia.com' },
+    update: {},
+    create: {
+      email: 'user@autoindia.com',
+      name: 'Test User',
+      hashedPassword: userPassword,
+      isAdmin: false,
+    },
+  });
+
+  console.log('✅ Dummy products, categories, and users seeded!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Seed failed:', e);
+    console.error(e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .finally(() => prisma.$disconnect());
