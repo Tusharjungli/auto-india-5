@@ -21,22 +21,31 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (status === 'loading') return;
 
-    if (!session?.user?.isAdmin) {
+    // ✅ Not logged in at all → redirect to login
+    if (status === 'unauthenticated') {
       router.push('/login');
-    } else {
-      const fetchStats = async () => {
-        try {
-          const res = await fetch('/api/admin/stats', { cache: 'no-store' });
-          const data = await res.json();
-          setStats(data);
-        } catch (error) {
-          console.error('❌ Failed to load stats:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchStats();
+      return;
     }
+
+    // ✅ Logged in but not admin → redirect to homepage
+    if (session && !session.user?.isAdmin) {
+      router.push('/');
+      return;
+    }
+
+    // ✅ Logged in and admin → fetch stats
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/admin/stats', { cache: 'no-store' });
+        const data = await res.json();
+        setStats(data);
+      } catch (error) {
+        console.error('❌ Failed to load stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
   }, [session, status, router]);
 
   if (loading || status === 'loading') {

@@ -1,11 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  experimental: {
-    serverActions: true, // ✅ Newer feature (if using form actions)
-  },
   images: {
-    domains: ['yourdomain.com', 'images.unsplash.com'], // ✅ Add other sources if needed
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**', // Allow all domains or specify your image domains
+      },
+    ],
+  },
+  experimental: {
+    serverActions: {}, // ✅ Must be an object, not boolean
   },
 };
 

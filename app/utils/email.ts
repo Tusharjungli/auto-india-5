@@ -10,13 +10,26 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// ✅ Transporter Verify (No unused variables!)
+transporter.verify((error) => {
+  if (error) {
+    console.error('❌ Transporter Verification Failed:', error);
+  } else {
+    console.log('✅ Transporter is ready to send emails!');
+  }
+});
+
 /**
  * Sends order confirmation email.
  * @param to Customer's email.
  * @param orderId The ID of the placed order.
  */
-export async function sendOrderConfirmation(to: string, orderId: string) {
+export async function sendOrderConfirmation(to: string, orderId: string): Promise<void> {
   try {
+    console.log('📤 Attempting to send order confirmation email...');
+    console.log('📧 Sending to:', to);
+    console.log('🆔 Order ID:', orderId);
+
     const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM,
       to,
@@ -32,8 +45,12 @@ export async function sendOrderConfirmation(to: string, orderId: string) {
       `,
     });
 
-    console.log('✅ Email sent successfully:', info.messageId);
-  } catch (error) {
-    console.error('❌ Error sending order confirmation email:', error);
+    console.log('✅ Email sent successfully. Message ID:', info.messageId);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('❌ Error sending order confirmation email:', error.message);
+    } else {
+      console.error('❌ Unknown error sending order confirmation email:', error);
+    }
   }
 }

@@ -46,7 +46,9 @@ export default function AdminOrdersPage() {
         )
       );
     } else {
-      console.error('❌ Failed to update status');
+      const { error } = await res.json();
+      console.error('❌ Failed to update status', error);
+      alert(`❌ Failed to update status: ${error}`);
     }
   };
 

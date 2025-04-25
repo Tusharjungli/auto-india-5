@@ -14,9 +14,7 @@ export async function GET() {
     include: {
       user: true,
       items: {
-        include: {
-          product: true,
-        },
+        include: { product: true },
       },
     },
     orderBy: { createdAt: 'desc' },

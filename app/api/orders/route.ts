@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
-import { sendOrderConfirmation } from '@/app/utils/email'; // ✅ Fixed import path
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { sendOrderConfirmation } from '@/app/utils/email'; // ✅ Add this import
 
 type CartItem = {
   id: string;
@@ -10,19 +12,25 @@ type CartItem = {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { userEmail, cart, total } = body;
+    const session = await getServerSession(authOptions);
 
-    if (!userEmail || !Array.isArray(cart) || cart.length === 0 || typeof total !== 'number') {
-      return NextResponse.json({ error: 'Invalid order payload' }, { status: 400 });
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized: Please log in.' }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { cart, total } = body;
+
+    if (!Array.isArray(cart) || cart.length === 0 || typeof total !== 'number') {
+      return NextResponse.json({ error: 'Invalid order data.' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: userEmail },
+      where: { email: session.user.email },
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: 'User not found.' }, { status: 404 });
     }
 
     const order = await prisma.order.create({
@@ -37,21 +45,15 @@ export async function POST(req: NextRequest) {
           })),
         },
       },
-      include: {
-        items: {
-          include: {
-            product: true, // ✅ Include product name for email
-          },
-        },
-      },
+      include: { items: true },
     });
 
-    // ✅ Send confirmation email (now passing 2 args)
-    await sendOrderConfirmation(user.email, order.id);
+    // ✅ Send the confirmation email after successful order creation:
+    await sendOrderConfirmation(session.user.email, order.id);
 
     return NextResponse.json(order, { status: 201 });
   } catch (error) {
-    console.error('❌ Order creation failed:', error);
-    return NextResponse.json({ error: 'Server error while placing order' }, { status: 500 });
+    console.error('❌ Order creation error:', error);
+    return NextResponse.json({ error: 'Server error while placing order.' }, { status: 500 });
   }
 }
