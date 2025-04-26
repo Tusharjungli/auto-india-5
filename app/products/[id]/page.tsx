@@ -5,6 +5,7 @@ import ProductDetailClient from "@/components/ProductDetailClient";
 import Breadcrumb from "@/components/Breadcrumb";
 import ProductTabs from "@/components/ProductTabs";
 import ProductCard from "@/components/ProductCard";
+import FeedbackForm from "@/components/FeedbackForm";
 
 type Props = {
   params: { id: string };
@@ -41,6 +42,7 @@ export default async function ProductDetail({ params }: Props) {
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"
+              priority
             />
           </div>
           <div className="flex flex-col justify-between">
@@ -61,10 +63,10 @@ export default async function ProductDetail({ params }: Props) {
           </div>
         </div>
 
-        {/* ✅ Product tabs (Step 1) */}
-        <ProductTabs description={product.description ?? ''} />
+        {/* ✅ Product tabs */}
+        <ProductTabs description={product.description ?? ""} />
 
-        {/* ✅ Related products (Step 2) */}
+        {/* ✅ Related products */}
         <div className="mt-12">
           <h2 className="text-2xl font-semibold mb-4">Related Products</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -75,10 +77,16 @@ export default async function ProductDetail({ params }: Props) {
                 name={item.name}
                 price={item.price}
                 imageUrl={item.imageUrl}
-                description={item.description ?? ''}
+                description={item.description ?? ""}
               />
             ))}
           </div>
+        </div>
+
+        {/* ✅ Feedback Form Integration */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-semibold mb-4">Submit Your Feedback</h2>
+          <FeedbackForm productId={product.id} />
         </div>
       </div>
     </main>
