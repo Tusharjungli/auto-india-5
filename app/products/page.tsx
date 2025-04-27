@@ -15,7 +15,6 @@ export default function ProductsPage() {
   const [priceRange, setPriceRange] = useState(0);
   const [page, setPage] = useState(1);
 
-  // 🧠 Restore scroll position on mount
   useEffect(() => {
     const savedY = sessionStorage.getItem('scrollY');
     if (savedY) window.scrollTo(0, parseInt(savedY));
@@ -27,7 +26,6 @@ export default function ProductsPage() {
     };
   }, []);
 
-  // 💾 Restore filters from sessionStorage
   useEffect(() => {
     const saved = sessionStorage.getItem('filters');
     if (saved) {
@@ -38,7 +36,6 @@ export default function ProductsPage() {
     }
   }, []);
 
-  // 💾 Save filters to sessionStorage
   useEffect(() => {
     sessionStorage.setItem(
       'filters',
@@ -127,10 +124,14 @@ export default function ProductsPage() {
         ))}
       </div>
 
-      {/* 📦 Product Grid */}
+      {/* 📦 Product Grid with Fallback Message */}
       {loading ? (
         <div className="flex justify-center mt-10">
           <ClipLoader size={40} color="#888" />
+        </div>
+      ) : products.length === 0 ? (
+        <div className="text-center text-gray-500 mt-10 text-lg">
+          🚫 No products found. Try adjusting your search or filters.
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">

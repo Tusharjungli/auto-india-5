@@ -13,11 +13,12 @@ export default function ProductTabs({ description }: Props) {
 
   return (
     <div className="mt-10">
+      {/* 🟢 Tab Buttons */}
       <div className="flex space-x-4 border-b border-gray-700 mb-4">
-        {['description', 'compatibility', 'shipping'].map((t) => (
+        {(['description', 'compatibility', 'shipping'] as Tab[]).map((t) => (
           <button
             key={t}
-            onClick={() => setTab(t as Tab)}
+            onClick={() => setTab(t)}
             className={`capitalize pb-2 border-b-2 transition ${
               tab === t
                 ? 'border-white text-white'
@@ -29,21 +30,26 @@ export default function ProductTabs({ description }: Props) {
         ))}
       </div>
 
+      {/* 🟢 Tab Content */}
       {tab === 'description' && (
-        <p className="text-gray-400">{description || 'No description available.'}</p>
+        <p className="text-gray-400">
+          {description || 'No description available for this product.'}
+        </p>
       )}
+
       {tab === 'compatibility' && (
         <ul className="text-gray-400 space-y-1 list-disc list-inside">
-          <li>Compatible with most Indian sedans and SUVs</li>
-          <li>Check with your vehicle model before purchase</li>
-          <li>Free return if incompatible</li>
+          <li>Compatible with most Indian sedans, hatchbacks, and SUVs.</li>
+          <li>Always check with your vehicle model before purchase.</li>
+          <li>Free return policy if incompatible (within 7 days).</li>
         </ul>
       )}
+
       {tab === 'shipping' && (
         <ul className="text-gray-400 space-y-1 list-disc list-inside">
-          <li>Ships in 1–2 business days</li>
-          <li>Delivery across India within 3–7 days</li>
-          <li>Free shipping on orders over ₹999</li>
+          <li>Ships within 1–2 business days.</li>
+          <li>Delivery across India within 3–7 working days.</li>
+          <li>Free shipping on orders above ₹999.</li>
         </ul>
       )}
     </div>

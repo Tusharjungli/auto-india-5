@@ -3,51 +3,85 @@ import { prisma } from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 
 async function main() {
-  // ✅ Create Categories
+  // ✅ Categories
+  const categories = [
+    { id: 'c1', name: 'Brake Pads', slug: 'brake-pads' },
+    { id: 'c2', name: 'Engine Oils', slug: 'engine-oils' },
+    { id: 'c3', name: 'Air Filters', slug: 'air-filters' },
+    { id: 'c4', name: 'Filters', slug: 'filters' },
+    { id: 'c5', name: 'Electrical Components', slug: 'electrical-components' },
+    { id: 'c6', name: 'Suspension & Steering', slug: 'suspension-steering' },
+    { id: 'c7', name: 'Cooling Systems', slug: 'cooling-systems' },
+    { id: 'c8', name: 'Transmission Parts', slug: 'transmission-parts' },
+    { id: 'c9', name: 'Lighting', slug: 'lighting' },
+    { id: 'c10', name: 'Body Parts', slug: 'body-parts' },
+    { id: 'c11', name: 'Accessories', slug: 'accessories' },
+  ];
+
   await prisma.category.createMany({
-    data: [
-      { id: 'c1', name: 'Brake Pads', slug: 'brake-pads' },
-      { id: 'c2', name: 'Engine Oils', slug: 'engine-oils' },
-      { id: 'c3', name: 'Air Filters', slug: 'air-filters' },
-    ],
+    data: categories,
     skipDuplicates: true,
   });
 
-  // ✅ Create Products
+  console.log('✅ Categories seeded.');
+
+  // ✅ Products
+  const products = [
+    {
+      id: 'p1',
+      name: 'Kia Brake Pads',
+      price: 1500,
+      stock: 20,
+      imageUrl: '/images/products/brake-pads.jpg', // ✅ Local folder image
+      categoryId: 'c1',
+      description: 'High-performance brake pads for Kia vehicles.',
+    },
+    {
+      id: 'p2',
+      name: 'Castrol Engine Oil 5W-30',
+      price: 2500,
+      stock: 50,
+      imageUrl: '/images/products/engine-oil.jpg',
+      categoryId: 'c2',
+      description: 'Premium Castrol engine oil suitable for Indian conditions.',
+    },
+    {
+      id: 'p3',
+      name: 'Hyundai Air Filter',
+      price: 800,
+      stock: 30,
+      imageUrl: '/images/products/air-filter.jpg',
+      categoryId: 'c3',
+      description: 'Durable air filter compatible with Hyundai models.',
+    },
+    {
+      id: 'p4',
+      name: 'LED Headlight Bulb H4 12V',
+      price: 1200,
+      stock: 40,
+      imageUrl: '/images/products/led-headlight.jpg',
+      categoryId: 'c9',
+      description: 'Energy-efficient LED headlight bulbs for better visibility.',
+    },
+    {
+      id: 'p5',
+      name: 'Maruti Suzuki Suspension Kit',
+      price: 4200,
+      stock: 15,
+      imageUrl: '/images/products/suspension-kit.jpg',
+      categoryId: 'c6',
+      description: 'Complete suspension kit for Maruti Suzuki models.',
+    },
+  ];
+
   await prisma.product.createMany({
-    data: [
-      {
-        id: 'p1',
-        name: 'Kia Brake Pads',
-        price: 1500,
-        stock: 20,
-        imageUrl: '/images/products/brake-pads.jpg',
-        categoryId: 'c1',
-        description: 'High-performance brake pads for Kia vehicles.',
-      },
-      {
-        id: 'p2',
-        name: 'Castrol Engine Oil 5W-30',
-        price: 2500,
-        stock: 50,
-        imageUrl: '/images/products/engine-oil.jpg',
-        categoryId: 'c2',
-        description: 'Premium Castrol engine oil suitable for Indian conditions.',
-      },
-      {
-        id: 'p3',
-        name: 'Hyundai Air Filter',
-        price: 800,
-        stock: 30,
-        imageUrl: '/images/products/air-filter.jpg',
-        categoryId: 'c3',
-        description: 'Durable air filter compatible with Hyundai models.',
-      },
-    ],
+    data: products,
     skipDuplicates: true,
   });
 
-  // ✅ Create Admin and Test Users
+  console.log('✅ Products seeded.');
+
+  // ✅ Admin and Test User Seeding
   const adminPassword = await bcrypt.hash('admin123', 10);
   const userPassword = await bcrypt.hash('user123', 10);
 
@@ -73,12 +107,12 @@ async function main() {
     },
   });
 
-  console.log('✅ Dummy products, categories, and users seeded!');
+  console.log('✅ Admin and Test User seeded.');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Seeding error:', e);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());
