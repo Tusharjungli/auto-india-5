@@ -82,6 +82,14 @@ export default function ProductsPage() {
     setPage(1);
   };
 
+  const handleResetFilters = () => {
+    setSearch('');
+    setPriceRange(0);
+    setSelectedCategories([]);
+    setPage(1);
+    sessionStorage.removeItem('filters');
+  };
+
   return (
     <main className="p-6 bg-[var(--bg)] text-[var(--text)] min-h-screen">
       <h1 className="text-3xl font-bold mb-6 text-center">All Products</h1>
@@ -122,17 +130,23 @@ export default function ProductsPage() {
             {cat.name}
           </button>
         ))}
+        {selectedCategories.length > 0 || search || priceRange ? (
+          <button
+            onClick={handleResetFilters}
+            className="px-4 py-2 rounded-full text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition ml-4"
+          >
+            Reset Filters
+          </button>
+        ) : null}
       </div>
 
-      {/* 📦 Product Grid with Fallback Message */}
+      {/* 📦 Product Grid */}
       {loading ? (
         <div className="flex justify-center mt-10">
           <ClipLoader size={40} color="#888" />
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center text-gray-500 mt-10 text-lg">
-          🚫 No products found. Try adjusting your search or filters.
-        </div>
+        <div className="text-center text-gray-400 mt-20">🚫 No products found matching your filters.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {products.map((product) => (
