@@ -1,15 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  experimental: {
+    serverActions: true, // Optional based on your Next.js version
+  },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**', // Allow all domains or specify your image domains
+        hostname: '**.cloudinary.com', // ✅ Allow Cloudinary images
+      },
+      {
+        protocol: 'https',
+        hostname: '**.unsplash.com',    // ✅ Optional: Allow Unsplash (if needed)
       },
     ],
-  },
-  experimental: {
-    serverActions: {}, // ✅ Must be an object, not boolean
+    domains: ['dcr9w09mx.cloudinary.com'], // ✅ Replace with your actual Cloudinary domain if needed
   },
 };
 

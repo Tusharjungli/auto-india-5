@@ -18,15 +18,11 @@ export default function ProductCard({
   imageUrl,
   description,
 }: ProductCardProps) {
-  // 🛠️ Properly handle local and Cloudinary image URLs:
-  const getFormattedImageUrl = (url: string) => {
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url; // ✅ Cloudinary or external link
-    }
-    if (url.startsWith('/')) {
-      return url; // ✅ Public folder image
-    }
-    return `/images/${url.replace(/^\/+/, '')}`; // ✅ Fallback for relative paths
+  const getSafeImageUrl = (url: string) => {
+    if (!url) return '/images/default-placeholder.png'; // ✅ Fallback image
+    if (url.startsWith('http://') || url.startsWith('https://')) return url; // External (Cloudinary, etc.)
+    if (url.startsWith('/')) return url; // Public folder
+    return `/images/${url.replace(/^\/+/, '')}`; // Relative, fix with /images/
   };
 
   return (
@@ -34,7 +30,7 @@ export default function ProductCard({
       <Link href={`/products/${id}`}>
         <div className="relative w-full h-56 mb-4">
           <Image
-            src={getFormattedImageUrl(imageUrl)}
+            src={getSafeImageUrl(imageUrl)}
             alt={name}
             fill
             className="object-cover rounded"
@@ -43,9 +39,7 @@ export default function ProductCard({
           />
         </div>
         <h3 className="text-lg font-semibold mb-1">{name}</h3>
-        <p className="text-sm text-gray-500 mb-2">
-          {description.slice(0, 60)}...
-        </p>
+        <p className="text-sm text-gray-500 mb-2">{description.slice(0, 60)}...</p>
         <div className="text-xl font-bold">₹{price.toLocaleString()}</div>
       </Link>
     </div>
