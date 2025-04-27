@@ -3,22 +3,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
-// ✅ GET: Fetch all products (Admin only)
-export async function GET() {
+// ✅ GET: Fetch paginated products (Admin only)
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.isAdmin) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: 'desc' },
-  });
+  const { searchParams } = new URL(req.url);
+  const page = Number(searchParams.get('page')) || 1;
+  const pageSize = Number(searchParams.get('pageSize')) || 6;
 
-  return NextResponse.json(products);
+  const skip = (page - 1) * pageSize;
+
+  const [products, totalProducts] = await Promise.all([
+    prisma.product.findMany({
+      skip,
+      take: pageSize,
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.product.count(),
+  ]);
+
+  return NextResponse.json({
+    products,
+    totalProducts,
+    totalPages: Math.ceil(totalProducts / pageSize),
+    currentPage: page,
+  });
 }
 
-// ✅ POST: Add new product with category ID validation
+// ✅ POST: Add new product (no change here)
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -29,13 +45,11 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { name, description, price, stock, imageUrl, categoryId } = body;
 
-  // ❌ Check for missing fields
   if (!name || !price || !stock || !imageUrl || !categoryId) {
     return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
   }
 
   try {
-    // ✅ Verify that the Category exists
     const category = await prisma.category.findUnique({
       where: { id: categoryId },
     });
@@ -44,16 +58,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid Category ID. Category does not exist.' }, { status: 400 });
     }
 
-    // ✅ Create the product if category is valid
     const product = await prisma.product.create({
-      data: {
-        name,
-        description,
-        price,
-        stock,
-        imageUrl,
-        categoryId,
-      },
+      data: { name, description, price, stock, imageUrl, categoryId },
     });
 
     return NextResponse.json(product, { status: 201 });

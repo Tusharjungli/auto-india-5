@@ -18,16 +18,14 @@ export default function ProductCard({
   imageUrl,
   description,
 }: ProductCardProps) {
-  // ✅ Ensure proper formatting of the image URL:
   const getFormattedImageUrl = (url: string) => {
     if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url; // Already correct
+      return url; // ✅ Cloudinary or external URL
     }
     if (url.startsWith('/')) {
-      return url; // Local public folder image
+      return url; // ✅ Public folder image with leading slash
     }
-    // Fallback: Add 'https://' if it's missing
-    return `https://${url.replace(/^\/+/, '')}`;
+    return `/images/${url.replace(/^\/+/, '')}`; // ✅ Fallback for relative paths
   };
 
   return (

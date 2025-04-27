@@ -1,11 +1,11 @@
-import { prisma } from "@/lib/prisma";
-import Image from "next/image";
-import { notFound } from "next/navigation";
-import ProductDetailClient from "@/components/ProductDetailClient";
-import Breadcrumb from "@/components/Breadcrumb";
-import ProductTabs from "@/components/ProductTabs";
-import ProductCard from "@/components/ProductCard";
-import FeedbackForm from "@/components/FeedbackForm";
+import { prisma } from '@/lib/prisma';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import ProductDetailClient from '@/components/ProductDetailClient';
+import Breadcrumb from '@/components/Breadcrumb';
+import ProductTabs from '@/components/ProductTabs';
+import ProductCard from '@/components/ProductCard';
+import FeedbackForm from '@/components/FeedbackForm';
 
 type Props = {
   params: { id: string };
@@ -23,13 +23,23 @@ export default async function ProductDetail({ params }: Props) {
 
   if (!product) return notFound();
 
+  const getFormattedImageUrl = (url: string) => {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    if (url.startsWith('/')) {
+      return url;
+    }
+    return `/images/${url.replace(/^\/+/, '')}`;
+  };
+
   return (
     <main className="min-h-screen p-6 bg-[var(--bg)] text-[var(--text)]">
       <div className="max-w-4xl mx-auto">
         <Breadcrumb
           items={[
-            { label: "Home", href: "/" },
-            { label: "Products", href: "/products" },
+            { label: 'Home', href: '/' },
+            { label: 'Products', href: '/products' },
             { label: product.name, href: `/products/${product.id}` },
           ]}
         />
@@ -37,12 +47,11 @@ export default async function ProductDetail({ params }: Props) {
         <div className="grid md:grid-cols-2 gap-8">
           <div className="relative w-full h-96 rounded overflow-hidden border dark:border-gray-800">
             <Image
-              src={product.imageUrl}
+              src={getFormattedImageUrl(product.imageUrl)}
               alt={product.name}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"
-              priority
             />
           </div>
           <div className="flex flex-col justify-between">
@@ -53,7 +62,6 @@ export default async function ProductDetail({ params }: Props) {
             <div className="text-xl font-semibold mb-6">
               ₹{product.price.toLocaleString()}
             </div>
-
             <ProductDetailClient
               id={product.id}
               name={product.name}
@@ -63,10 +71,8 @@ export default async function ProductDetail({ params }: Props) {
           </div>
         </div>
 
-        {/* ✅ Product tabs */}
-        <ProductTabs description={product.description ?? ""} />
+        <ProductTabs description={product.description ?? ''} />
 
-        {/* ✅ Related products */}
         <div className="mt-12">
           <h2 className="text-2xl font-semibold mb-4">Related Products</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -77,17 +83,13 @@ export default async function ProductDetail({ params }: Props) {
                 name={item.name}
                 price={item.price}
                 imageUrl={item.imageUrl}
-                description={item.description ?? ""}
+                description={item.description ?? ''}
               />
             ))}
           </div>
         </div>
 
-        {/* ✅ Feedback Form Integration */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-semibold mb-4">Submit Your Feedback</h2>
-          <FeedbackForm productId={product.id} />
-        </div>
+        <FeedbackForm productId={product.id} />
       </div>
     </main>
   );
