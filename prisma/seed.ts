@@ -32,8 +32,11 @@ async function main() {
       name: 'Kia Brake Pads',
       price: 1500,
       stock: 20,
-      imageUrl: '/images/products/brake-pads.jpg', // ✅ Local folder image
+      imageUrl: '/images/products/brake-pads.jpg',
       categoryId: 'c1',
+      brand: 'Kia',
+      vehicle: 'Seltos, Sonet',
+      engineType: 'Petrol',
       description: 'High-performance brake pads for Kia vehicles.',
     },
     {
@@ -43,6 +46,9 @@ async function main() {
       stock: 50,
       imageUrl: '/images/products/engine-oil.jpg',
       categoryId: 'c2',
+      brand: 'Castrol',
+      vehicle: 'All Cars',
+      engineType: 'Diesel, Petrol',
       description: 'Premium Castrol engine oil suitable for Indian conditions.',
     },
     {
@@ -52,6 +58,9 @@ async function main() {
       stock: 30,
       imageUrl: '/images/products/air-filter.jpg',
       categoryId: 'c3',
+      brand: 'Hyundai',
+      vehicle: 'i10, i20, Creta',
+      engineType: 'Petrol',
       description: 'Durable air filter compatible with Hyundai models.',
     },
     {
@@ -61,6 +70,9 @@ async function main() {
       stock: 40,
       imageUrl: '/images/products/led-headlight.jpg',
       categoryId: 'c9',
+      brand: 'Philips',
+      vehicle: 'All Cars',
+      engineType: 'Universal',
       description: 'Energy-efficient LED headlight bulbs for better visibility.',
     },
     {
@@ -70,6 +82,9 @@ async function main() {
       stock: 15,
       imageUrl: '/images/products/suspension-kit.jpg',
       categoryId: 'c6',
+      brand: 'Maruti Suzuki',
+      vehicle: 'Swift, Baleno',
+      engineType: 'Petrol',
       description: 'Complete suspension kit for Maruti Suzuki models.',
     },
   ];
@@ -81,7 +96,7 @@ async function main() {
 
   console.log('✅ Products seeded.');
 
-  // ✅ Admin and Test User Seeding
+  // ✅ Admin and User Seeding
   const adminPassword = await bcrypt.hash('admin123', 10);
   const userPassword = await bcrypt.hash('user123', 10);
 

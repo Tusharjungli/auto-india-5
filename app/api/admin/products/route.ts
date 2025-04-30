@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
   });
 }
 
-// ✅ POST: Add new product (no change here)
+// ✅ POST: Add new product (with brand, vehicle, engineType)
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -43,9 +43,19 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { name, description, price, stock, imageUrl, categoryId } = body;
+  const {
+    name,
+    description,
+    brand,
+    vehicle,
+    engineType,
+    price,
+    stock,
+    imageUrl,
+    categoryId,
+  } = body;
 
-  if (!name || !price || !stock || !imageUrl || !categoryId) {
+  if (!name || !price || !stock || !imageUrl || !categoryId || !brand || !vehicle || !engineType) {
     return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
   }
 
@@ -59,7 +69,17 @@ export async function POST(req: NextRequest) {
     }
 
     const product = await prisma.product.create({
-      data: { name, description, price, stock, imageUrl, categoryId },
+      data: {
+        name,
+        description,
+        brand,
+        vehicle,
+        engineType,
+        price,
+        stock,
+        imageUrl,
+        categoryId,
+      },
     });
 
     return NextResponse.json(product, { status: 201 });

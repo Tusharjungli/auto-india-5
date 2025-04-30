@@ -5,6 +5,7 @@ import { Product, Category } from '@prisma/client';
 import ProductCard from '@/components/ProductCard';
 import debounce from 'lodash.debounce';
 import ClipLoader from 'react-spinners/ClipLoader';
+import Link from 'next/link';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -37,10 +38,7 @@ export default function ProductsPage() {
   }, []);
 
   useEffect(() => {
-    sessionStorage.setItem(
-      'filters',
-      JSON.stringify({ search, priceRange, selectedCategories })
-    );
+    sessionStorage.setItem('filters', JSON.stringify({ search, priceRange, selectedCategories }));
   }, [search, priceRange, selectedCategories]);
 
   useEffect(() => {
@@ -49,12 +47,7 @@ export default function ProductsPage() {
       .then(setCategories);
   }, []);
 
-  const fetchProducts = async (
-    searchQuery: string,
-    maxPrice: number,
-    categoryIds: string[],
-    currentPage: number
-  ) => {
+  const fetchProducts = async (searchQuery: string, maxPrice: number, categoryIds: string[], currentPage: number) => {
     setLoading(true);
     const url = new URL('/api/products', window.location.origin);
     url.searchParams.set('search', searchQuery);
@@ -140,13 +133,33 @@ export default function ProductsPage() {
         ) : null}
       </div>
 
-      {/* 📦 Product Grid */}
+      {/* 📦 Product Grid or Empty State */}
       {loading ? (
         <div className="flex justify-center mt-10">
           <ClipLoader size={40} color="#888" />
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center text-gray-400 mt-20">🚫 No products found matching your filters.</div>
+        <div className="text-center text-gray-400 mt-20 flex flex-col items-center">
+          <p className="text-xl mb-4">🚫 No matching products found.</p>
+          <p className="text-sm mb-6 max-w-md text-center text-gray-500">
+            Try adjusting your filters, reducing the price range, or exploring all products.
+          </p>
+          <div className="flex gap-4">
+            <button
+              onClick={handleResetFilters}
+              className="px-6 py-2 bg-primary text-white rounded hover:bg-secondary transition"
+            >
+              Reset Filters
+            </button>
+            <Link
+              href="/products"
+              className="px-6 py-2 border border-primary text-primary bg-[var(--bg)] rounded hover:bg-primary hover:text-white transition"
+            >
+              Explore All
+            </Link>
+
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {products.map((product) => (

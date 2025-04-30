@@ -9,6 +9,9 @@ export default function AddProductForm() {
   const [price, setPrice] = useState<number>(0);
   const [stock, setStock] = useState<number>(0);
   const [categoryId, setCategoryId] = useState('');
+  const [brand, setBrand] = useState('');
+  const [vehicle, setVehicle] = useState('');
+  const [engineType, setEngineType] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -25,7 +28,7 @@ export default function AddProductForm() {
         { method: 'POST', body: formData }
       );
       const data = await res.json();
-      return data.secure_url; // ✅ Cloudinary URL for database
+      return data.secure_url;
     } catch (error) {
       console.error('❌ Image upload failed:', error);
       return null;
@@ -47,7 +50,7 @@ export default function AddProductForm() {
       const res = await fetch('/api/admin/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description, price, stock, imageUrl, categoryId }),
+        body: JSON.stringify({ name, description, price, stock, imageUrl, categoryId, brand, vehicle, engineType }),
       });
 
       if (res.ok) {
@@ -57,6 +60,9 @@ export default function AddProductForm() {
         setPrice(0);
         setStock(0);
         setCategoryId('');
+        setBrand('');
+        setVehicle('');
+        setEngineType('');
         setImageFile(null);
       } else {
         const errorData = await res.json();
@@ -77,6 +83,9 @@ export default function AddProductForm() {
       <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(Number(e.target.value))} required className="input" />
       <input type="number" placeholder="Stock" value={stock} onChange={(e) => setStock(Number(e.target.value))} required className="input" />
       <input type="text" placeholder="Category ID" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required className="input" />
+      <input type="text" placeholder="Brand (e.g. Bosch, TVS)" value={brand} onChange={(e) => setBrand(e.target.value)} className="input" />
+      <input type="text" placeholder="Compatible Vehicle (e.g. Swift, Scorpio)" value={vehicle} onChange={(e) => setVehicle(e.target.value)} className="input" />
+      <input type="text" placeholder="Engine Type (e.g. Petrol, Diesel)" value={engineType} onChange={(e) => setEngineType(e.target.value)} className="input" />
       <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} required className="input" />
       <button type="submit" disabled={isUploading} className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
         {isUploading ? 'Uploading...' : 'Add Product'}

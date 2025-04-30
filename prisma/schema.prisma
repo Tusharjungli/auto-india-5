@@ -71,6 +71,9 @@ model Product {
   price       Int
   stock       Int        @default(0)
   imageUrl    String
+  engineType  String?
+  brand       String?
+  vehicle    String?
   category    Category   @relation(fields: [categoryId], references: [id])
   categoryId  String
   orderItems  OrderItem[]

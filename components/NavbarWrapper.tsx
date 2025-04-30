@@ -1,7 +1,13 @@
-'use client';  // ✅ This forces client-side execution
+'use client';
 
 import Navbar from './Navbar';
+import ThemeToggle from './ThemeToggle';
 
 export default function NavbarWrapper() {
-  return <Navbar />;
+  return (
+    <>
+      <Navbar />
+      <ThemeToggle />
+    </>
+  );
 }
